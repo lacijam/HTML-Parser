@@ -1,6 +1,9 @@
 import re
 
-file = open("index.html", "r")
+from flask import Flask, request, render_template
+app = Flask(__name__)
+
+file = open("templates/index.html", "r")
 
 html_content = file.read().replace("\n", "")
 
@@ -63,9 +66,34 @@ def print_dom(element, level=0):
 
     print(f"{prefix}</{element.tag}>")
 
-if __name__ == '__main__':
+def dom_to_string(element):
+    result = "<div class='element-container'><span>"
+    
+    if len(element.children) > 0:
+        result += "<div class='toggle-child-button'></div>"
+
+    result += element.tag + "</span>"
+
+    if len(element.children) > 0:
+        result += "<div class='element-child-container'>"
+
+        for child in element.children:
+            result += dom_to_string(child)
+
+        result += "</div>"
+
+    elif element.content:
+        result += "<div class='element-content'>" + element.content + "</div>"
+
+    result += "</div>"
+
+    return result
+
+@app.route('/', methods=['GET'])
+def index():
     dom = parseHtml(html_content, [Element("document")])
 
-    print(findElement("footer", dom).content)
+    return render_template('index.html', domContent=dom_to_string(dom))
 
-    print(dom.children[0].tag)
+if __name__ == '__main__':
+    app.run()
