@@ -27,6 +27,9 @@ def parseHtml(html_content, stack=[]):
         tag1, attrs1, content1, tag2, attrs2 = match.groups()
         if tag1:
             tag, attrs, content = tag1, attrs1, content1
+
+            # Remove unescaped whitespace
+            content = " ".join(content.split())
         else:
             tag, attrs, content = tag2, attrs2, None
 
@@ -63,6 +66,6 @@ def print_dom(element, level=0):
 if __name__ == '__main__':
     dom = parseHtml(html_content, [Element("document")])
 
-    print(findElement("p", dom).content)
+    print(findElement("footer", dom).content)
 
     print(dom.children[0].tag)
